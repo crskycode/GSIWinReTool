@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FGSIWinTool": {
+      "commandName": "Project",
+      "commandLineArgs": "-b \"C:\\Users\\Shiroha\\Desktop\\同级生Scripts\""
+    }
+  }
+}
