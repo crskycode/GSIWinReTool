@@ -16,8 +16,8 @@ namespace GSIWinReTool
                 Console.WriteLine("  created by Crsky");
                 Console.WriteLine();
                 Console.WriteLine("Usage:");
-                Console.WriteLine("  Export text      : GSIWinReTool -e [file|folder]");
-                Console.WriteLine("  Rebuild script   : GSIWinReTool -b [file|folder]");
+                Console.WriteLine("  Export text      : GSIWinReTool -e Shift_JIS [file|folder]");
+                Console.WriteLine("  Rebuild script   : GSIWinReTool -b Shift_JIS [file|folder]");
                 Console.WriteLine();
                 Console.WriteLine("Press any key to continue...");
                 Console.ReadKey();
@@ -25,7 +25,8 @@ namespace GSIWinReTool
             }
 
             var mode = args[0];
-            var path = Path.GetFullPath(args[1]);
+            var enc = args[1];
+            var path = Path.GetFullPath(args[2]);
 
             switch (mode)
             {
@@ -37,7 +38,7 @@ namespace GSIWinReTool
                         {
                             try
                             {
-                                Export(filePath);
+                                Export(filePath, enc);
                             }
                             catch (Exception e)
                             {
@@ -49,7 +50,7 @@ namespace GSIWinReTool
                         {
                             try
                             {
-                                Export(filePath);
+                                Export(filePath, enc);
                             }
                             catch (Exception e)
                             {
@@ -59,7 +60,7 @@ namespace GSIWinReTool
                     }
                     else
                     {
-                        Export(path);
+                        Export(path, enc);
                     }
 
                     break;
@@ -72,7 +73,7 @@ namespace GSIWinReTool
                         {
                             try
                             {
-                                Rebuild(filePath);
+                                Rebuild(filePath, enc);
                             }
                             catch (Exception e)
                             {
@@ -84,7 +85,7 @@ namespace GSIWinReTool
                         {
                             try
                             {
-                                Rebuild(filePath);
+                                Rebuild(filePath, enc);
                             }
                             catch (Exception e)
                             {
@@ -94,7 +95,7 @@ namespace GSIWinReTool
                     }
                     else
                     {
-                        Export(path);
+                        Export(path, enc);
                     }
 
                     break;
@@ -102,7 +103,7 @@ namespace GSIWinReTool
             }
         }
 
-        static void Export(string path)
+        static void Export(string path, string enc)
         {
             Console.WriteLine("Processing {0}", path);
 
@@ -110,10 +111,10 @@ namespace GSIWinReTool
 
             var image = new ScriptFile();
             image.Load(path);
-            image.ExportText(txtPath);
+            image.ExportText(txtPath, enc);
         }
 
-        static void Rebuild(string path)
+        static void Rebuild(string path, string enc)
         {
             Console.WriteLine("Processing {0}", path);
 
@@ -128,7 +129,7 @@ namespace GSIWinReTool
 
             var image = new ScriptFile();
             image.Load(path);
-            image.ImportText(txtPath);
+            image.ImportText(txtPath, enc);
             image.Save(newPath);
         }
     }
