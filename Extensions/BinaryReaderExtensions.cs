@@ -7,7 +7,7 @@ namespace GSIWinReTool.Extensions
 {
     public static class BinaryReaderExtensions
     {
-        public static string ReadNullTerminatedString(this BinaryReader reader)
+        public static string ReadNullTerminatedString(this BinaryReader reader, Encoding encoding)
         {
             var bytes = new List<byte>(1024);
 
@@ -18,7 +18,7 @@ namespace GSIWinReTool.Extensions
 
             if (bytes.Count > 0)
             {
-                return Encoding.GetEncoding(932).GetString(bytes.ToArray());
+                return encoding.GetString(bytes.ToArray());
             }
 
             return string.Empty;

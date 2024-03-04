@@ -7,9 +7,9 @@ namespace GSIWinReTool.Extensions
 {
     public static class BinaryWriterExtensions
     {
-        public static void WriteNullTerminatedString(this BinaryWriter writer, string value)
+        public static void WriteNullTerminatedString(this BinaryWriter writer, string value, Encoding encoding)
         {
-            var bytes = Encoding.GetEncoding(932).GetBytes(value);
+            var bytes = encoding.GetBytes(value);
             writer.Write(bytes);
             writer.Write((byte)0);
         }
