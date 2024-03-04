@@ -10,7 +10,7 @@ namespace GSIWinReTool
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            if (args.Length != 2)
+            if (args.Length != 3)
             {
                 Console.WriteLine("GSIWinReTool v1.0");
                 Console.WriteLine("  created by Crsky");
