@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace GSIWinReTool
@@ -102,6 +103,7 @@ namespace GSIWinReTool
             var stream = new MemoryStream(_codeBuffer);
             var reader = new BinaryReader(stream);
 
+            var encoding = Encoding.GetEncoding(932);
             var stack = new List<int>(8);
 
             while (stream.Position < stream.Length)
@@ -158,7 +160,7 @@ namespace GSIWinReTool
                     }
                     case GSIWinReInstruction.Msg2:
                     {
-                        reader.ReadNullTerminatedString();
+                        reader.ReadNullTerminatedString(encoding);
                         break;
                     }
                     case GSIWinReInstruction.Op0C:
@@ -281,7 +283,7 @@ namespace GSIWinReTool
                     }
                     case GSIWinReInstruction.PushString:
                     {
-                        reader.ReadNullTerminatedString();
+                        reader.ReadNullTerminatedString(encoding);
                         break;
                     }
                     case GSIWinReInstruction.Add:
@@ -383,12 +385,14 @@ namespace GSIWinReTool
             }
         }
 
-        public void ExportText(string path)
+        public void ExportText(string path, string enc)
         {
             var writer = File.CreateText(path);
 
             var stream = new MemoryStream(_codeBuffer);
             var reader = new BinaryReader(stream);
+
+            var encoding = Encoding.GetEncoding(enc);
 
             foreach (var rec in _assembly)
             {
@@ -397,13 +401,17 @@ namespace GSIWinReTool
                 if (rec.Instruction == GSIWinReInstruction.Msg)
                 {
                     stream.Position = rec.Addr + 1;
-                    s = reader.ReadCompressedString();
+
+                    if (encoding.CodePage == 932)
+                        s = reader.ReadCompressedString();
+                    else
+                        s = reader.ReadNullTerminatedString(encoding);
                 }
                 else if (rec.Instruction == GSIWinReInstruction.Msg2 ||
                     rec.Instruction == GSIWinReInstruction.PushString)
                 {
                     stream.Position = rec.Addr + 1;
-                    s = reader.ReadNullTerminatedString();
+                    s = reader.ReadNullTerminatedString(encoding);
                 }
 
                 if (!string.IsNullOrWhiteSpace(s) && s[0] > 0x80)
@@ -462,7 +470,7 @@ namespace GSIWinReTool
             return dict;
         }
 
-        public void ImportText(string path)
+        public void ImportText(string path, string enc)
         {
             Console.WriteLine("Loading translation...");
 
@@ -478,6 +486,8 @@ namespace GSIWinReTool
             var outStream = new MemoryStream(_codeBuffer.Length * 2);
             var outWriter = new BinaryWriter(outStream);
 
+            var encoding = Encoding.GetEncoding(enc);
+
             Console.WriteLine("Building code...");
 
             foreach (var rec in _assembly.Instructions)
@@ -489,7 +499,11 @@ namespace GSIWinReTool
                     if (translation.TryGetValue(rec.Addr, out string? text))
                     {
                         outWriter.Write((byte)rec.Instruction);
-                        outWriter.WriteCompressedString(text);
+
+                        if (encoding.CodePage == 932)
+                            outWriter.WriteCompressedString(text);
+                        else
+                            outWriter.WriteNullTerminatedString(text, encoding);
                     }
                     else
                     {
@@ -502,7 +516,7 @@ namespace GSIWinReTool
                     if (translation.TryGetValue(rec.Addr, out string? text))
                     {
                         outWriter.Write((byte)rec.Instruction);
-                        outWriter.WriteNullTerminatedString(text);
+                        outWriter.WriteNullTerminatedString(text, encoding);
                     }
                     else
                     {
